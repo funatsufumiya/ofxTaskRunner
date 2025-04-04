@@ -24,7 +24,7 @@ class ofApp : public ofBaseApp{
 		ofxTaskRunner<ofApp> taskRunner;
 
 		std::vector<int> task_ids;
-		static const int NUM_TASKS = 5;
+		const int NUM_TASKS = 5;
 
 		struct TaskParams {
 			float x;
