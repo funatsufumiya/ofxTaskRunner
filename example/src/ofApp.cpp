@@ -62,7 +62,6 @@ void ofApp::draw(){
 	ofSetColor(255);
 	ofDrawBitmapString("Simple Task Example", 20, 20);
 	ofDrawBitmapString("Background color changes every second", 20, 40);
-	ofDrawBitmapString("Press SPACE to restart animation", 20, 60);
 	
 	// Display current color values
 	ofDrawBitmapString("Current color: R:" + ofToString(backgroundColor.r) + 

@@ -103,7 +103,6 @@ void ofApp::draw(){
 	ofSetColor(255);
 	ofDrawBitmapString("Synchronized Tasks Example", 20, 20);
 	ofDrawBitmapString("All " + ofToString(NUM_TASKS) + " tasks are synchronized", 20, 40);
-	ofDrawBitmapString("Press SPACE to restart animation", 20, 60);
 
 }
 
