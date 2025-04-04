@@ -1,6 +1,6 @@
 # ofxTaskRunner
 
-A task runner addon for openFrameworks that allows you to create time-based sequences of actions.
+A task runner addon for openFrameworks that allows you to create time-based sequences of actions. (kinda like [UniTask](https://github.com/Cysharp/UniTask) or [bevy_flurx](https://github.com/not-elm/bevy_flurx))
 
 ## Features
 
