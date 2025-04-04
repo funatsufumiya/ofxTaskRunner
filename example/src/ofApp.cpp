@@ -6,23 +6,27 @@ void ofApp::setup(){
 	ofSetVerticalSync(true);
 	ofSetFrameRate(60);
 
+	taskRunner.setup(*this);
+
 	taskRunner.createTaskQueue()
 		.wait_sec(1.0)
-		.then([](ofApp& self){
+		.then_on_draw([](ofApp& self){
 			ofBackground(255, 0, 0);
 		})
 		.wait_sec(2.0)
-		.then([](ofApp& self){
+		.then_on_draw([](ofApp& self){
 			ofBackground(0, 255, 0);
 		});
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+	taskRunner.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	taskRunner.draw();
 }
 
 //--------------------------------------------------------------

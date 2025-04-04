@@ -257,9 +257,9 @@ public:
 template <typename App>
 class DrawTask : public Task {
 public:
-    std::function<void(const App&)> draw_task;
+    std::function<void(App&)> draw_task;
 
-    DrawTask(std::function<void(const App&)> draw_task) {
+    DrawTask(std::function<void(App&)> draw_task) {
         this->draw_task = draw_task;
     }
 
@@ -367,7 +367,7 @@ public:
     }
 
     /// add draw task
-    TaskQueue<App>& then_on_draw(std::function<void(const App&)> draw_task) {
+    TaskQueue<App>& then_on_draw(std::function<void(App&)> draw_task) {
         tasks.push(std::move(make_unique<DrawTask<App>>(draw_task)));
         return *this;
     }
@@ -542,7 +542,7 @@ protected:
     taskrunner::optional::optional_ref<App> app;
 
     taskrunner::container::queue<std::function<void(App&)>> update_tasks;
-    taskrunner::container::queue<std::function<void(const App&)>> draw_tasks;
+    taskrunner::container::queue<std::function<void(App&)>> draw_tasks;
     /// tasks which create new task queue
     taskrunner::container::queue<CreateTaskQueueTask<App>> create_task_queue_tasks;
     bool _should_end = false;
