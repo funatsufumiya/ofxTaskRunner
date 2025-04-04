@@ -6,16 +6,42 @@ void ofApp::setup(){
 	ofSetVerticalSync(true);
 	ofSetFrameRate(60);
 
+	// Initialize background color
+	backgroundColor = ofColor(0, 0, 0);
+
 	taskRunner.setup(*this);
 
+	// Create a simple task queue that changes background color in 5 stages
 	taskRunner.createTaskQueue()
 		.wait_sec(1.0)
-		.then_on_draw([](ofApp& self){
-			ofBackground(255, 0, 0);
+		.then([this](ofApp& self){
+			// Stage 1: Red
+			backgroundColor = ofColor(255, 0, 0);
 		})
-		.wait_sec(2.0)
-		.then_on_draw([](ofApp& self){
-			ofBackground(0, 255, 0);
+		.wait_sec(1.0)
+		.then([this](ofApp& self){
+			// Stage 2: Green
+			backgroundColor = ofColor(0, 255, 0);
+		})
+		.wait_sec(1.0)
+		.then([this](ofApp& self){
+			// Stage 3: Blue
+			backgroundColor = ofColor(0, 0, 255);
+		})
+		.wait_sec(1.0)
+		.then([this](ofApp& self){
+			// Stage 4: Yellow
+			backgroundColor = ofColor(255, 255, 0);
+		})
+		.wait_sec(1.0)
+		.then([this](ofApp& self){
+			// Stage 5: Purple
+			backgroundColor = ofColor(255, 0, 255);
+		})
+		.wait_sec(1.0)
+		.then([this](ofApp& self){
+			// Return to black (end of cycle)
+			backgroundColor = ofColor(0, 0, 0);
 		});
 }
 
@@ -26,7 +52,22 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	// Set background color based on the current task state
+	ofBackground(backgroundColor);
+	
+	// Draw task runner (if needed)
 	taskRunner.draw();
+	
+	// Display explanatory text
+	ofSetColor(255);
+	ofDrawBitmapString("Simple Task Example", 20, 20);
+	ofDrawBitmapString("Background color changes every second", 20, 40);
+	ofDrawBitmapString("Press SPACE to restart animation", 20, 60);
+	
+	// Display current color values
+	ofDrawBitmapString("Current color: R:" + ofToString(backgroundColor.r) + 
+					  " G:" + ofToString(backgroundColor.g) + 
+					  " B:" + ofToString(backgroundColor.b), 20, 80);
 }
 
 //--------------------------------------------------------------

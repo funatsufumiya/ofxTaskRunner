@@ -174,20 +174,20 @@ private:
     float wait_time_sec;
     float wait_started_timef;
     bool need_sync;
-    int screen_id;
+    int task_id;
     std::string task_queue_name;
 
     static map<std::string, float> wait_started_timef_map_for_names;
-    static map<std::pair<int, std::string>, bool> done_map_for_name_and_screen_id;
-    static vector<int> registered_screen_ids;
+    static map<std::pair<int, std::string>, bool> done_map_for_name_and_task_id;
+    static vector<int> registered_task_ids;
     static std::mutex sync_mutex;
 
 public:
-    WaitTask(float wait_time_sec, bool need_sync, int screen_id, std::string task_queue_name) {
+    WaitTask(float wait_time_sec, bool need_sync, int task_id, std::string task_queue_name) {
         this->wait_time_sec = wait_time_sec;
         this->wait_started_timef = -9999.9f;
         this->need_sync = need_sync;
-        this->screen_id = screen_id;
+        this->task_id = task_id;
         this->task_queue_name = task_queue_name;
     }
 
@@ -195,10 +195,11 @@ public:
         return TaskType::WAIT;
     }
 
-    /// register screen id at setup (need to detect single screen mode for debug)
-    static void registerScreenId(int screen_id) {
-        if (std::find(registered_screen_ids.begin(), registered_screen_ids.end(), screen_id) == registered_screen_ids.end()) {
-            registered_screen_ids.push_back(screen_id);
+    /// @brief register task id at setup (need to detect all tasks are done for sync)
+    /// @param task_id 
+    static void registerTaskId(int task_id) {
+        if (std::find(registered_task_ids.begin(), registered_task_ids.end(), task_id) == registered_task_ids.end()) {
+            registered_task_ids.push_back(task_id);
         }
     }
 
@@ -225,14 +226,14 @@ public:
         if (this->need_sync) {
             if (bDone) {
                 lock_guard<mutex> lock(sync_mutex);
-                auto key = std::make_pair(this->screen_id, this->task_queue_name);
-                done_map_for_name_and_screen_id[key] = true;
+                auto key = std::make_pair(this->task_id, this->task_queue_name);
+                done_map_for_name_and_task_id[key] = true;
                 
-                // if all screen is done, clean it (with task queue name)
+                // if all tasks/screens are done, clean them (with task queue name)
                 bool all_done = true;
-                for (auto& screen_id : registered_screen_ids) {
-                    auto _key = std::make_pair(screen_id, this->task_queue_name);
-                    if (done_map_for_name_and_screen_id.count(_key) == 0) {
+                for (auto& task_id : registered_task_ids) {
+                    auto _key = std::make_pair(task_id, this->task_queue_name);
+                    if (done_map_for_name_and_task_id.count(_key) == 0) {
                         all_done = false;
                         break;
                     }
@@ -240,10 +241,10 @@ public:
 
                 if (all_done) {
                     // delete map item with task queue name
-                    for (auto& screen_id : registered_screen_ids) {
-                        auto _key = std::make_pair(screen_id, this->task_queue_name);
-                        if (done_map_for_name_and_screen_id.count(_key) > 0) {
-                            done_map_for_name_and_screen_id.erase(_key);
+                    for (auto& task_id : registered_task_ids) {
+                        auto _key = std::make_pair(task_id, this->task_queue_name);
+                        if (done_map_for_name_and_task_id.count(_key) > 0) {
+                            done_map_for_name_and_task_id.erase(_key);
                         }
                     }
                 }
@@ -288,10 +289,10 @@ template <typename App>
 class CreateTaskQueueTask : public Task {
 public:
     std::function<void(TaskQueue<App>&)> func_for_new_task_queue;
-    int screen_id;
+    int task_id;
     std::string task_queue_name;
-    CreateTaskQueueTask(int screen_id, std::string task_queue_name, std::function<void(TaskQueue<App>&)> func_for_new_task_queue) {
-        this->screen_id = screen_id;
+    CreateTaskQueueTask(int task_id, std::string task_queue_name, std::function<void(TaskQueue<App>&)> func_for_new_task_queue) {
+        this->task_id = task_id;
         this->task_queue_name = task_queue_name;
         this->func_for_new_task_queue = func_for_new_task_queue;
     }
@@ -308,11 +309,11 @@ private:
     taskrunner::container::queue<unique_ptr<Task>> tasks;
 
 public:
-    int screen_id;
+    int task_id;
     std::string task_queue_name;
 
-    TaskQueue(int screen_id, std::string task_queue_name) {
-        this->screen_id = screen_id;
+    TaskQueue(int task_id, std::string task_queue_name) {
+        this->task_id = task_id;
         this->task_queue_name = task_queue_name;
     }
 
@@ -353,7 +354,7 @@ public:
     /// add wait task (in seconds)
     TaskQueue<App>& wait_sec(float wait_time_sec, bool need_sync = false) {
         bool is_first_task = tasks.empty();
-        tasks.push(std::move(make_unique<WaitTask>(wait_time_sec, need_sync, screen_id, task_queue_name)));
+        tasks.push(std::move(make_unique<WaitTask>(wait_time_sec, need_sync, task_id, task_queue_name)));
         if (is_first_task) {
             WaitTask& wait_task = static_cast<WaitTask&>(*tasks.front());
             wait_task.start();
@@ -385,7 +386,7 @@ public:
 
     /// add task which create new task queue
     TaskQueue<App>& then_create_task_queue(std::string task_queue_name, std::function<void(TaskQueue<App>&)> func_for_new_task_queue) {
-        tasks.push(std::move(make_unique<CreateTaskQueueTask<App>>(screen_id, task_queue_name, func_for_new_task_queue)));
+        tasks.push(std::move(make_unique<CreateTaskQueueTask<App>>(task_id, task_queue_name, func_for_new_task_queue)));
         return *this;
     }
 };
@@ -407,6 +408,12 @@ public:
         create_task_queue_tasks.clear();
 
         this->app = app;
+    }
+
+    /// @brief register task id at setup (need to detect all tasks are done for sync)
+    /// @param task_id 
+    void registerTaskId(int task_id) {
+        WaitTask::registerTaskId(task_id);
     }
 
     void clearTaskQueues() {
@@ -490,7 +497,7 @@ public:
             auto& t = create_task_queue_tasks.front();
             create_task_queue_tasks.pop();
 
-            auto&& new_task_queue = createTaskQueue(t.screen_id, t.task_queue_name);
+            auto&& new_task_queue = createTaskQueue(t.task_id, t.task_queue_name);
             t.func_for_new_task_queue(new_task_queue);
         }
     }
@@ -511,8 +518,8 @@ public:
         }
     }
 
-    TaskQueue<App>& createTaskQueue(int screen_id, std::string name) {
-        task_queues.push_back(TaskQueue<App>(screen_id, name));
+    TaskQueue<App>& createTaskQueue(int task_id, std::string name) {
+        task_queues.push_back(TaskQueue<App>(task_id, name));
         return task_queues.back();
     }
 
