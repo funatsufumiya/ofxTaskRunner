@@ -8,7 +8,7 @@ A task runner addon for openFrameworks that allows you to create time-based sequ
 - Chain actions using a fluent interface
 - Synchronize multiple tasks
 
-## Note: about threads ( vs ofxAsync)
+## Note: about threads ( vs ofxAsync )
 
 This addon is not using other threads. All actions are done on the main thread.
 
