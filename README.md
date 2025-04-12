@@ -80,7 +80,7 @@ void ofApp::draw(){
 
 ### Synchronized Tasks Example
 
-You can create multiple tasks (for example: multiple screen, same multiple tasks) that run in sync with each other:
+You can create multiple tasks that run in sync with each other (for example: multiple screen app, which has same synced multiple tasks):
 
 ```cpp
 for(int i = 0; i < NUM_TASKS; i++) {
