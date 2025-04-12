@@ -36,28 +36,28 @@ void ofApp::setup(){
 
 		
 		taskRunner.createTaskQueue(task_ids[i], "sync_task")
-			.wait_sec(1.0, true) // Wait 1 second (synchronized)
+			.wait_sync_sec(1.0) // Wait 1 second (synchronized)
 			.then([taskIndex](ofApp& self){
 				// Start displaying with small size
 				self.taskParams[taskIndex].visible = true;
 				self.taskParams[taskIndex].size = 50;
 			})
-			.wait_sec(1.0, true) // Wait 1 second (synchronized)
+			.wait_sync_sec(1.0) // Wait 1 second (synchronized)
 			.then([taskIndex](ofApp& self){
 				// Set to medium size
 				self.taskParams[taskIndex].size = 100;
 			})
-			.wait_sec(1.0, true) // Wait 1 second (synchronized)
+			.wait_sync_sec(1.0) // Wait 1 second (synchronized)
 			.then([taskIndex](ofApp& self){
 				// Set to large size
 				self.taskParams[taskIndex].size = 150;
 			})
-			.wait_sec(1.0, true) // Wait 1 second (synchronized)
+			.wait_sync_sec(1.0) // Wait 1 second (synchronized)
 			.then([taskIndex](ofApp& self){
 				// Return to small size
 				self.taskParams[taskIndex].size = 50;
 			})
-			.wait_sec(1.0, true) // Wait 1 second (synchronized)
+			.wait_sync_sec(1.0) // Wait 1 second (synchronized)
 			.then([taskIndex](ofApp& self){
 				// Hide (end of animation)
 				self.taskParams[taskIndex].visible = false;

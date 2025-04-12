@@ -367,6 +367,16 @@ public:
         return wait_sec(wait_time_millis / 1000.0f, need_sync);
     }
 
+    /// add sync wait task (in seconds)
+    TaskQueue<App>& wait_sync_sec(float wait_time_sec) {
+        return wait_sec(wait_time_sec, true);
+    }
+
+    /// add sync wait task (in milliseconds)
+    TaskQueue<App>& wait_sync_ms(float wait_time_millis) {
+        return wait_ms(wait_time_millis, true);
+    }
+
     /// add draw task
     TaskQueue<App>& then_on_draw(std::function<void(App&)> draw_task) {
         tasks.push(std::move(make_unique<DrawTask<App>>(draw_task)));

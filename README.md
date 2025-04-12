@@ -95,11 +95,11 @@ for(int i = 0; i < NUM_TASKS; i++) {
     int taskId = i + 1;
     
     taskRunner.createTaskQueue(taskId, "sync_task") // Group tasks by task name
-        .wait_sec(1.0, true) // The 'true' parameter enables synchronization
+        .wait_sync_sec(1.0) // synchroned wait among group
         .then([](ofApp& self){
             // First action
         })
-        .wait_sec(1.0, true)
+        .wait_sync_sec(1.0) // synchroned wait among group
         .then([](ofApp& self){
             // Second action
         });
