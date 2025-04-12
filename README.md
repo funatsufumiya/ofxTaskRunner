@@ -118,7 +118,7 @@ for(int i = 0; i < NUM_TASKS; i++) {
 ### TaskQueue<AppType>
 
 - `TaskQueue<AppType>& wait_sec(float seconds, bool sync = false)` - Wait for the specified number of seconds
-- `TaskQueue<AppType>& then(std::function<void(AppType&)> callback)` - Execute a callback function
+- `TaskQueue<AppType>& then(std::function<void(AppType&)> callback)` - Execute a callback function, alias of `then_on_update()`
 - `TaskQueue<AppType>& then_on_update(std::function<void(AppType&)> callback)` - Execute a callback during update
 - `TaskQueue<AppType>& then_on_draw(std::function<void(AppType&)> callback)` - Execute a callback during draw
 
