@@ -74,7 +74,7 @@ void ofApp::update(){
 
 void ofApp::draw(){
     ofBackground(backgroundColor);
-    taskRunner.draw(); // Optional: draw any task-related visuals
+    taskRunner.draw(); // Optional: draw any task-related visuals (described in then_on_draw() functions)
 }
 ```
 
